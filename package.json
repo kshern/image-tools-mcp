@@ -1,0 +1,37 @@
+{
+  "name": "image-size-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-image-size": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mcp",
+    "image size",
+    "ai",
+    "model-context-protocol"
+  ],
+  "author": "kshern",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.5.0",
+    "@types/node": "^22.13.4",
+    "probe-image-size": "^7.2.3",
+    "typescript": "^5.7.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/probe-image-size": "^7.2.5"
+  }
+}
