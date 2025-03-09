@@ -10,8 +10,8 @@ import fs from "fs";
 
 const server = new McpServer(
   {
-    name: "image-size-mcp-server",
-    version: "1.0.0",
+    name: "image-tools-mcp-server",
+    version: "0.0.1",
   },
   {
     capabilities: {
@@ -118,6 +118,8 @@ server.tool(
     }
   }
 );
+
+
 
 async function main() {
   const transport = new StdioServerTransport();

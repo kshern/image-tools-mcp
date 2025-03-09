@@ -1,4 +1,4 @@
-# Image Size MCP
+# Image Tools MCP
 
 一个基于 Model Context Protocol (MCP) 的图片尺寸获取服务，支持从 URL 和本地文件获取图片尺寸信息。
 
@@ -11,7 +11,7 @@
 ## 安装
 
 ```bash
-npm install image-size-mcp
+npm install image-tools-mcp
 ```
 
 ## 使用方法
@@ -35,9 +35,9 @@ npm install image-size-mcp
 ```json
 {
   "mcpServers": {
-    "image-size": {
+    "image-tools": {
       "command": "npx",
-      "args": ["image-size-mcp"]
+      "args": ["image-tools-mcp"]
     }
   }
 }

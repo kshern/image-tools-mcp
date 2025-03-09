@@ -1,13 +1,13 @@
 {
-  "name": "image-size-mcp",
-  "version": "1.0.0",
+  "name": "image-tools-mcp",
+  "version": "0.0.1",
   "description": "A Model Context Protocol (MCP) service for retrieving image dimensions, supporting both URL and local file sources.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
     "mcp-image-size": "./dist/index.js"
-  },
+  },  
   "files": [
     "dist",
     "README.md",

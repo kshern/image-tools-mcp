@@ -1,4 +1,4 @@
-# Image Size MCP
+# Image Tools MCP
 
 A Model Context Protocol (MCP) service for retrieving image dimensions, supporting both URL and local file sources.
 
@@ -13,7 +13,7 @@ A Model Context Protocol (MCP) service for retrieving image dimensions, supporti
 ## Installation
 
 ```bash
-npm install image-size-mcp
+npm install image-tools-mcp
 ```
 
 ## Usage
@@ -37,9 +37,9 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 ```json
 {
   "mcpServers": {
-    "image-size": {
+    "image-tools": {
       "command": "npx",
-      "args": ["image-size-mcp"]
+      "args": ["image-tools-mcp"]
     }
   }
 }
