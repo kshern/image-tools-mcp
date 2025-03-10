@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "mcp-image-size": "./dist/index.js"
+    "image-tools-mcp": "./dist/index.js"
   },
   "files": [
     "dist",
