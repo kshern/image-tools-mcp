@@ -19,11 +19,11 @@ const setTinifyApiKey = () => {
 export const registerCompressImageFromUrlTool = (server: McpServer) => {
   server.tool(
     "compress_image_from_url",
-    "Compress an image from URL using TinyPNG/TinyJPG API",
+    "Compress a single image from URL using TinyPNG API (only supports image files, not folders)",
     {
       options: z
         .object({
-          imageUrl: z.string().describe("URL of the image to compress"),
+          imageUrl: z.string().describe("URL of the image to compress (must be a direct link to an image file)"),
           outputFormat: z.enum(["webp", "jpeg", "jpg", "png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
         })
         .describe("Options for compressing image from URL"),
@@ -95,11 +95,11 @@ export const registerCompressImageFromUrlTool = (server: McpServer) => {
 export const registerCompressLocalImageTool = (server: McpServer) => {
   server.tool(
     "compress_local_image",
-    "Compress a local image using TinyPNG/TinyJPG API",
+    "Compress a single local image file using TinyPNG API (only supports image files, not folders)",
     {
       options: z
         .object({
-          imagePath: z.string().describe("Absolute path to the local image"),
+          imagePath: z.string().describe("Absolute path to the local image file (must be a file, not a directory)"),
           outputPath: z.string().optional().describe("Absolute path for the compressed output image"),
           outputFormat: z.enum(["image/webp", "image/jpeg", "image/jpg", "image/png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
         })
@@ -138,7 +138,7 @@ export const registerCompressLocalImageTool = (server: McpServer) => {
         let finalOutputPath = outputPath;
         if (!finalOutputPath) {
           const dir = path.dirname(imagePath);
-          const ext = outputFormat || path.extname(imagePath).slice(1) || "jpg";
+          const ext = outputFormat || path.extname(imagePath).slice(1) || "image/jpg";
           const basename = path.basename(imagePath, path.extname(imagePath));
           finalOutputPath = path.join(dir, `${basename}_compressed.${ext}`);
         }
