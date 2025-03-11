@@ -6,8 +6,8 @@
 
 - 支持从 URL 获取远程图片尺寸
 - 支持从本地文件获取图片尺寸
-- 使用 TinyPNG/TinyJPG API 压缩远程 URL 图片
-- 使用 TinyPNG/TinyJPG API 压缩本地图片文件
+- 使用 TinyPNG API 压缩远程 URL 图片
+- 使用 TinyPNG API 压缩本地图片文件
 - 支持转换图片格式（webp、jpeg/jpg、png）
 - 返回图片的宽度、高度、类型、MIME 类型和压缩信息
 
@@ -25,8 +25,8 @@ npm install image-tools-mcp
 
 1. `get_image_size` - 获取远程图片尺寸
 2. `get_local_image_size` - 获取本地图片尺寸
-3. `compress_image_from_url` - 使用 TinyPNG/TinyJPG API 压缩远程图片
-4. `compress_local_image` - 使用 TinyPNG/TinyJPG API 压缩本地图片
+3. `compress_image_from_url` - 使用 TinyPNG API 压缩远程图片
+4. `compress_local_image` - 使用 TinyPNG API 压缩本地图片
 
 ### 客户端集成
 
@@ -156,7 +156,7 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 
 本项目基于以下库实现：
 - [probe-image-size](https://github.com/nodeca/probe-image-size) - 用于图片尺寸检测
-- [tinify](https://github.com/tinify/tinify-nodejs) - 通过 TinyPNG/TinyJPG API 进行图片压缩
+- [tinify](https://github.com/tinify/tinify-nodejs) - 通过 TinyPNG API 进行图片压缩
 
 ## 环境变量
 

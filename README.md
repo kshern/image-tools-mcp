@@ -8,8 +8,8 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 
 - Retrieve image dimensions from URLs
 - Get image dimensions from local files
-- Compress images from URLs using TinyPNG/TinyJPG API
-- Compress local images using TinyPNG/TinyJPG API
+- Compress images from URLs using TinyPNG API
+- Compress local images using TinyPNG API
 - Convert images to different formats (webp, jpeg/jpg, png)
 - Returns width, height, type, MIME type, and compression information
 
@@ -27,8 +27,8 @@ This service provides four tool functions:
 
 1. `get_image_size` - Get dimensions of remote images
 2. `get_local_image_size` - Get dimensions of local images
-3. `compress_image_from_url` - Compress remote images using TinyPNG/TinyJPG API
-4. `compress_local_image` - Compress local images using TinyPNG/TinyJPG API
+3. `compress_image_from_url` - Compress remote images using TinyPNG API
+4. `compress_local_image` - Compress local images using TinyPNG API
 
 ### Client Integration
 
@@ -158,7 +158,7 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 
 This project is built on the following libraries:
 - [probe-image-size](https://github.com/nodeca/probe-image-size) - For image dimension detection
-- [tinify](https://github.com/tinify/tinify-nodejs) - For image compression via the TinyPNG/TinyJPG API
+- [tinify](https://github.com/tinify/tinify-nodejs) - For image compression via the TinyPNG API
 
 ## Environment Variables
 
