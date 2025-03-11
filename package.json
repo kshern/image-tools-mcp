@@ -32,23 +32,23 @@
   ],
   "author": {
     "name": "kshern",
-    "email": "kshern@example.com"
+    "email": "kshern@live.com"
   },
   "contributors": [
     {
       "name": "kshern",
-      "email": "kshern@example.com"
+      "email": "kshern@live.com"
     }
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kshern/image-size-mcp"
+    "url": "https://github.com/kshern/image-tools-mcp"
   },
   "bugs": {
-    "url": "https://github.com/kshern/image-size-mcp/issues"
+    "url": "https://github.com/kshern/image-tools-mcp/issues"
   },
-  "homepage": "https://github.com/kshern/image-size-mcp#readme",
+  "homepage": "https://github.com/kshern/image-tools-mcp#readme",
   "engines": {
     "node": ">=18.0.0"
   },
