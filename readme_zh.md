@@ -1,12 +1,15 @@
 # Image Tools MCP
 
-一个基于 Model Context Protocol (MCP) 的图片尺寸获取服务，支持从 URL 和本地文件获取图片尺寸信息。
+一个基于 Model Context Protocol (MCP) 的图片工具服务，支持获取图片尺寸和压缩图片，可处理 URL 和本地文件源。
 
 ## 功能特点
 
 - 支持从 URL 获取远程图片尺寸
 - 支持从本地文件获取图片尺寸
-- 返回图片的宽度、高度、类型和 MIME 类型
+- 使用 TinyPNG/TinyJPG API 压缩远程 URL 图片
+- 使用 TinyPNG/TinyJPG API 压缩本地图片文件
+- 支持转换图片格式（webp、jpeg/jpg、png）
+- 返回图片的宽度、高度、类型、MIME 类型和压缩信息
 
 ## 安装
 
@@ -18,10 +21,12 @@ npm install image-tools-mcp
 
 ### 作为 MCP 服务使用
 
-该服务提供了两个工具函数：
+该服务提供了四个工具函数：
 
 1. `get_image_size` - 获取远程图片尺寸
 2. `get_local_image_size` - 获取本地图片尺寸
+3. `compress_image_from_url` - 使用 TinyPNG/TinyJPG API 压缩远程图片
+4. `compress_local_image` - 使用 TinyPNG/TinyJPG API 压缩本地图片
 
 ### 客户端集成
 
@@ -76,6 +81,27 @@ const localResult = await client.callTool("get_local_image_size", {
 });
 console.log(JSON.parse(localResult.content[0].text));
 // 输出: { width: 1024, height: 768, type: "png", mime: "image/png", path: "D:/path/to/image.png" }
+
+// 从 URL 压缩图片
+const compressUrlResult = await client.callTool("compress_image_from_url", {
+  options: {
+    imageUrl: "https://example.com/image.jpg",
+    outputFormat: "webp" // 可选：转换为 webp、jpeg/jpg 或 png
+  }
+});
+console.log(JSON.parse(compressUrlResult.content[0].text));
+// 输出: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", tempFilePath: "/tmp/compressed_1615456789.webp", format: "webp" }
+
+// 压缩本地图片
+const compressLocalResult = await client.callTool("compress_local_image", {
+  options: {
+    imagePath: "D:/path/to/image.png",
+    outputPath: "D:/path/to/compressed.webp", // 可选
+    outputFormat: "image/webp" // 可选：转换为 image/webp、image/jpeg 或 image/png
+  }
+});
+console.log(JSON.parse(compressLocalResult.content[0].text));
+// 输出: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", outputPath: "D:/path/to/compressed.webp", format: "webp" }
 ```
 
 ### 工具模式
@@ -100,9 +126,38 @@ console.log(JSON.parse(localResult.content[0].text));
 }
 ```
 
+#### compress_image_from_url
+
+```typescript
+{
+  options: {
+    imageUrl: string // 要压缩的图片 URL
+    outputFormat?: "webp" | "jpeg" | "jpg" | "png" // 可选的输出格式
+  }
+}
+```
+
+#### compress_local_image
+
+```typescript
+{
+  options: {
+    imagePath: string // 本地图片文件的绝对路径
+    outputPath?: string // 可选的压缩后图片的输出绝对路径
+    outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png" // 可选的输出格式
+  }
+}
+```
+
 ## 技术实现
 
-本项目基于 [probe-image-size](https://github.com/nodeca/probe-image-size) 库实现图片尺寸的获取功能。
+本项目基于以下库实现：
+- [probe-image-size](https://github.com/nodeca/probe-image-size) - 用于图片尺寸检测
+- [tinify](https://github.com/tinify/tinify-nodejs) - 通过 TinyPNG/TinyJPG API 进行图片压缩
+
+## 环境变量
+
+- `TINIFY_API_KEY` - 图片压缩功能所需。从 [TinyPNG](https://tinypng.com/developers) 获取您的 API 密钥
 
 ## 许可证
 

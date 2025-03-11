@@ -101,7 +101,7 @@ export const registerCompressLocalImageTool = (server: McpServer) => {
         .object({
           imagePath: z.string().describe("Absolute path to the local image"),
           outputPath: z.string().optional().describe("Absolute path for the compressed output image"),
-          outputFormat: z.enum(["webp", "jpeg", "jpg", "png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
+          outputFormat: z.enum(["image/webp", "image/jpeg", "image/jpg", "image/png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
         })
         .describe("Options for compressing local image"),
     },
@@ -113,7 +113,7 @@ export const registerCompressLocalImageTool = (server: McpServer) => {
         const { imagePath, outputPath, outputFormat } = options as { 
           imagePath: string;
           outputPath?: string;
-          outputFormat?: "webp" | "jpeg" | "jpg" | "png";
+          outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
         };
 
         // 检查文件是否存在
@@ -130,7 +130,7 @@ export const registerCompressLocalImageTool = (server: McpServer) => {
         // 如果指定了输出格式，则转换格式
         if (outputFormat) {
           // 使用类型断言来避免类型错误
-          const convertOptions = { type: outputFormat === "jpg" ? "jpeg" : outputFormat };
+          const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
           source = source.convert(convertOptions as any);
         }
 
