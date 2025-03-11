@@ -37,7 +37,8 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 #### Using with Claude Desktop
 
 1. Install Claude Desktop from [claude.ai/download](https://claude.ai/download)
-2. Configure Claude Desktop to use this MCP server by editing the configuration file:
+2. Get TinyPNG API key: Visit [TinyPNG](https://tinypng.com/developers) and get your API key
+3. Configure Claude Desktop to use this MCP server by editing the configuration file:
 
 ```json
 {
@@ -55,6 +56,9 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 
 3. Restart Claude Desktop
 4. Ask Claude to get image dimensions: "Can you tell me the dimensions of this image: https://example.com/image.jpg?"
+5. Ask Claude to compress an image: "Can you compress this image: https://example.com/image.jpg?"
+6. Ask Claude to compress a local image: "Can you compress this image: D:/path/to/image.png?"
+7. Ask Claude to compress a local image folder: "Can you compress this folder: D:/imageFolder?"
 
 #### Using with MCP Client Library
 

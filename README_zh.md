@@ -35,7 +35,8 @@ npm install image-tools-mcp
 #### 与 Claude Desktop 一起使用
 
 1. 从 [claude.ai/download](https://claude.ai/download) 安装 Claude Desktop
-2. 通过编辑配置文件，配置 Claude Desktop 使用此 MCP 服务器：
+2. 获取 TinyPNG API 密钥：访问 [TinyPNG](https://tinypng.com/developers) 并获取 API 密钥
+3. 通过编辑配置文件，配置 Claude Desktop 使用此 MCP 服务器：
 
 ```json
 {
@@ -51,8 +52,11 @@ npm install image-tools-mcp
 }
 ```
 
-3. 重启 Claude Desktop
-4. 请求 Claude 获取图片尺寸："能告诉我这张图片的尺寸吗：https://example.com/image.jpg？"
+4. 重启 Claude Desktop
+5. 请求 Claude 获取图片尺寸："告诉我这张图片的尺寸：https://example.com/image.jpg"
+6. 请求 Claude 压缩图片："帮我压缩这张图片：https://example.com/image.jpg"
+7. 请求 Claude 压缩本地图片："帮我压缩这张图片：D:/path/to/image.png？"
+8. 请求 Claude 压缩本地图片："帮我压缩这个文件夹下的图片：D:/imageFolder/"
 
 #### 使用 MCP 客户端库
 
