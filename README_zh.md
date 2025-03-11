@@ -42,7 +42,10 @@ npm install image-tools-mcp
   "mcpServers": {
     "image-tools": {
       "command": "npx",
-      "args": ["image-tools-mcp"]
+      "args": ["image-tools-mcp"],
+      "env": {
+        "TINIFY_API_KEY": "<YOUR_TINIFY_API_KEY>"
+      }
     }
   }
 }
