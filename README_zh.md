@@ -11,6 +11,11 @@
 - 支持转换图片格式（webp、jpeg/jpg、png）
 - 返回图片的宽度、高度、类型、MIME 类型和压缩信息
 
+### 效果展示
+
+![效果图1](./public/image_1.png)
+![效果图2](./public/image_2.png)
+
 ## 安装
 
 ```bash

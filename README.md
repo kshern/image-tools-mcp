@@ -13,6 +13,11 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 - Convert images to different formats (webp, jpeg/jpg, png)
 - Returns width, height, type, MIME type, and compression information
 
+### Example Results
+
+![Example Result 1](./public/image_1.png)
+![Example Result 2](./public/image_2.png)
+
 ## Installation
 
 ```bash
@@ -111,7 +116,6 @@ const compressLocalResult = await client.callTool("compress_local_image", {
 });
 console.log(JSON.parse(compressLocalResult.content[0].text));
 // Output: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", outputPath: "D:/path/to/compressed.webp", format: "webp" }
-```
 
 ### Tool Schemas
 
