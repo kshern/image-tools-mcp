@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片工具 MCP 客户端</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      background-color: #4a6bdf;
+      color: white;
+      border-radius: 10px 10px 0 0 !important;
+    }
+    
+    .btn-primary {
+      background-color: #4a6bdf;
+      border-color: #4a6bdf;
+    }
+    
+    .btn-primary:hover {
+      background-color: #3a5bc9;
+      border-color: #3a5bc9;
+    }
+    
+    #response-container {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+    
+    .connected {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .disconnected {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="mb-4">图片工具 MCP 客户端</h1>
+  
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-header">图片工具 MCP 客户端</div>
+      <div class="card-body">
+        <!-- API密钥设置区域 -->
+        <div class="mb-4">
+          <h4>API设置</h4>
+          <div class="form-group">
+            <label for="tinifyApiKey">TinyPNG API密钥</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="tinifyApiKey" placeholder="输入TinyPNG API密钥">
+              <div class="input-group-append">
+                <button class="btn btn-primary" id="saveApiKey">保存</button>
+              </div>
+            </div>
+            <small class="form-text text-muted">您可以在 <a href="https://tinypng.com/developers" target="_blank">TinyPNG开发者页面</a> 获取API密钥</small>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <h4>工具选择</h4>
+          <div class="form-group">
+            <label for="tool-select">选择工具:</label>
+            <select id="tool-select" class="form-select" onchange="updateToolForm()">
+              <option value="get_image_size">获取图片尺寸 (URL)</option>
+              <option value="get_local_image_size">获取图片尺寸 (本地)</option>
+              <option value="compress_image_from_url">压缩图片 (URL)</option>
+              <option value="compress_local_image">压缩图片 (本地)</option>
+            </select>
+          </div>
+          
+          <div id="tool-params" class="mb-3"></div>
+          
+          <button class="btn btn-primary" onclick="callTool()">调用工具</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">连接状态</div>
+          <div class="card-body">
+            <div id="connection-status" class="status disconnected">未连接</div>
+            <div class="mt-3">
+              <button class="btn btn-success me-2" id="connect-btn" onclick="connectSSE()">连接到 SSE</button>
+              <button class="btn btn-danger" id="disconnect-btn" onclick="disconnectSSE()" disabled>断开连接</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">响应</div>
+          <div class="card-body">
+            <div id="response-container" class="mb-4" style="height: 300px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 全局变量
+    let eventSource = null;
+    let tinifyApiKey = localStorage.getItem('tinifyApiKey') || '';
+    const tools = {
+      "get_image_size": {
+        name: "get_image_size",
+        description: "获取图片尺寸",
+        params: [
+          { name: "imageUrl", type: "string", description: "图片URL或本地路径" }
+        ]
+      },
+      "get_local_image_size": {
+        name: "get_local_image_size",
+        description: "获取本地图片尺寸",
+        params: [
+          { name: "imagePath", type: "string", description: "本地图片路径" }
+        ]
+      },
+      "compress_image_from_url": {
+        name: "compress_image_from_url",
+        description: "压缩URL图片",
+        params: [
+          { name: "imageUrl", type: "string", description: "图片URL" },
+          { name: "outputFormat", type: "select", description: "输出格式", 
+            options: [
+              { value: "", label: "使用原始格式" },
+              { value: "webp", label: "WebP" },
+              { value: "jpeg", label: "JPEG" },
+              { value: "png", label: "PNG" }
+            ]
+          }
+        ]
+      },
+      "compress_local_image": {
+        name: "compress_local_image",
+        description: "压缩本地图片",
+        params: [
+          { name: "imagePath", type: "string", description: "本地图片路径" },
+          { name: "outputPath", type: "string", description: "输出路径" },
+          { name: "outputFormat", type: "select", description: "输出格式", 
+            options: [
+              { value: "", label: "使用原始格式" },
+              { value: "image/webp", label: "WebP" },
+              { value: "image/jpeg", label: "JPEG" },
+              { value: "image/png", label: "PNG" }
+            ]
+          }
+        ]
+      }
+    };
+    
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function() {
+      // 加载保存的API密钥
+      const savedApiKey = localStorage.getItem('tinifyApiKey');
+      if (savedApiKey) {
+        document.getElementById('tinifyApiKey').value = savedApiKey;
+        tinifyApiKey = savedApiKey;
+      }
+      
+      // 设置保存API密钥按钮事件
+      document.getElementById('saveApiKey').addEventListener('click', function() {
+        const apiKey = document.getElementById('tinifyApiKey').value.trim();
+        if (apiKey) {
+          localStorage.setItem('tinifyApiKey', apiKey);
+          tinifyApiKey = apiKey;
+          alert('API密钥已保存！');
+        } else {
+          alert('请输入有效的API密钥');
+        }
+      });
+      
+      // 初始化工具表单
+      updateToolForm();
+    });
+    
+    // 连接到SSE
+    function connectSSE() {
+      if (eventSource) {
+        appendToResponse('已经连接到SSE');
+        return;
+      }
+      
+      try {
+        appendToResponse('正在连接到SSE...');
+        
+        // 创建SSE连接
+        eventSource = new EventSource('./sse');
+        
+        // 连接打开时
+        eventSource.onopen = function() {
+          document.getElementById('connection-status').textContent = '已连接';
+          document.getElementById('connection-status').className = 'status connected';
+          document.getElementById('connect-btn').disabled = true;
+          document.getElementById('disconnect-btn').disabled = false;
+          appendToResponse('SSE连接已建立');
+        };
+        
+        // 接收消息时
+        eventSource.onmessage = function(event) {
+          appendToResponse(`收到消息: ${event.data}`);
+          
+          try {
+            const data = JSON.parse(event.data);
+            
+            if (data.jsonrpc === "2.0") {
+              if (data.result) {
+                appendToResponse(`结果: ${JSON.stringify(data.result, null, 2)}`);
+              } else if (data.error) {
+                appendToResponse(`错误: ${JSON.stringify(data.error, null, 2)}`);
+              }
+            }
+          } catch (e) {
+            appendToResponse(`无法解析JSON: ${e.message}`);
+          }
+        };
+        
+        // 发生错误时
+        eventSource.onerror = function(error) {
+          appendToResponse(`SSE错误: ${JSON.stringify(error)}`);
+          disconnectSSE();
+        };
+      } catch (error) {
+        appendToResponse(`连接错误: ${error.message}`);
+      }
+    }
+    
+    // 断开SSE连接
+    function disconnectSSE() {
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+        document.getElementById('connection-status').textContent = '未连接';
+        document.getElementById('connection-status').className = 'status disconnected';
+        document.getElementById('connect-btn').disabled = false;
+        document.getElementById('disconnect-btn').disabled = true;
+        appendToResponse('SSE连接已断开');
+      }
+    }
+    
+    // 更新工具表单
+    function updateToolForm() {
+      const toolName = document.getElementById('tool-select').value;
+      const toolParamsDiv = document.getElementById('tool-params');
+      toolParamsDiv.innerHTML = '';
+      
+      if (!tools[toolName]) {
+        return;
+      }
+      
+      tools[toolName].params.forEach(param => {
+        const formGroup = document.createElement('div');
+        formGroup.className = 'form-group mb-3';
+        
+        const label = document.createElement('label');
+        label.textContent = param.description;
+        label.setAttribute('for', param.name);
+        label.className = 'form-label';
+        formGroup.appendChild(label);
+        
+        if (param.type === 'string') {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = param.name;
+          input.className = 'form-control';
+          formGroup.appendChild(input);
+        } else if (param.type === 'select') {
+          const select = document.createElement('select');
+          select.id = param.name;
+          select.className = 'form-select';
+          
+          if (param.options) {
+            param.options.forEach(option => {
+              const optionEl = document.createElement('option');
+              optionEl.value = option.value;
+              optionEl.textContent = option.label;
+              select.appendChild(optionEl);
+            });
+          }
+          
+          formGroup.appendChild(select);
+        }
+        
+        toolParamsDiv.appendChild(formGroup);
+      });
+    }
+    
+    // 调用工具
+    function callTool() {
+      const toolName = document.getElementById('tool-select').value;
+      const tool = tools[toolName];
+      
+      if (!tool) {
+        appendToResponse('错误: 未找到工具');
+        return;
+      }
+      
+      // 收集参数
+      const options = {};
+      tool.params.forEach(param => {
+        const input = document.getElementById(param.name);
+        if (input) {
+          options[param.name] = input.value;
+        }
+      });
+      
+      // 如果是压缩工具，检查API密钥
+      if (toolName.includes('compress') && !tinifyApiKey) {
+        appendToResponse('错误: 请先设置TinyPNG API密钥');
+        return;
+      }
+      
+      // 添加API密钥到选项中
+      if (toolName.includes('compress')) {
+        options.apiKey = tinifyApiKey;
+      }
+      
+      // 构建请求
+      const request = {
+        jsonrpc: "2.0",
+        id: Date.now().toString(),
+        method: "tool/execute",
+        params: {
+          name: toolName,
+          options: options
+        }
+      };
+      
+      appendToResponse(`请求已发送，等待响应...`);
+      
+      // 发送请求
+      fetch('./messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request)
+      }).catch(error => {
+        appendToResponse(`错误: ${error.message}`);
+      });
+    }
+    
+    // 添加到响应区域
+    function appendToResponse(text) {
+      const responseDiv = document.getElementById('response-container');
+      const formattedTime = new Date().toLocaleTimeString();
+      responseDiv.innerHTML += `\n[${formattedTime}] ${text}\n`;
+      responseDiv.scrollTop = responseDiv.scrollHeight;
+    }
+  </script>
+</body>
+</html>

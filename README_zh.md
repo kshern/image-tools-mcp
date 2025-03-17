@@ -1,15 +1,15 @@
-# Image Tools MCP
+# 图像工具 MCP 服务
 
-一个基于 Model Context Protocol (MCP) 的图片工具服务，支持获取图片尺寸和压缩图片，可处理 URL 和本地文件源。
+这是一个符合Model Context Protocol (MCP)的服务，提供图片尺寸获取和压缩功能，支持URL和本地文件源。
 
-## 功能特点
+## 功能
 
-- 支持从 URL 获取远程图片尺寸
-- 支持从本地文件获取图片尺寸
-- 使用 TinyPNG API 压缩远程 URL 图片
-- 使用 TinyPNG API 压缩本地图片文件
-- 支持转换图片格式（webp、jpeg/jpg、png）
-- 返回图片的宽度、高度、类型、MIME 类型和压缩信息
+- 获取网络图片尺寸
+- 获取本地图片尺寸
+- 压缩网络图片（使用TinyPNG API）
+- 压缩本地图片（使用TinyPNG API）
+- 支持标准输入/输出(stdio)传输
+- 支持服务器发送事件(SSE)传输
 
 ## 安装
 
@@ -19,153 +19,161 @@ npm install image-tools-mcp
 
 ## 使用方法
 
-### 作为 MCP 服务使用
+### 作为命令行工具
 
-该服务提供了四个工具函数：
+#### 使用标准输入/输出传输（默认）
 
-1. `get_image_size` - 获取远程图片尺寸
-2. `get_local_image_size` - 获取本地图片尺寸
-3. `compress_image_from_url` - 使用 TinyPNG API 压缩远程图片
-4. `compress_local_image` - 使用 TinyPNG API 压缩本地图片
+```bash
+npx image-tools-mcp
+```
 
-### 客户端集成
+#### 使用SSE传输（Web模式）
 
-要使用此 MCP 服务，您需要从 MCP 客户端连接到它。以下是与不同客户端集成的示例：
+```bash
+npx image-tools-mcp --sse
+# 可选：指定端口
+npx image-tools-mcp --sse --port 8080
+```
 
-#### 与 Claude Desktop 一起使用
+启动后，您可以访问：
+- http://localhost:3000 - 测试客户端页面
+- http://localhost:3000/sse - SSE流连接端点
+- http://localhost:3000/messages - 消息发送端点
 
-1. 从 [claude.ai/download](https://claude.ai/download) 安装 Claude Desktop
-2. 获取 TinyPNG API 密钥：访问 [TinyPNG](https://tinypng.com/developers) 并获取 API 密钥
-3. 通过编辑配置文件，配置 Claude Desktop 使用此 MCP 服务器：
+### 作为库使用
+
+在你的代码中：
+
+```javascript
+import { createServer } from 'image-tools-mcp/dist/server.js';
+import { registerAllTools } from 'image-tools-mcp/dist/tools/index.js';
+import { createTransport } from 'image-tools-mcp/dist/transport/transportFactory.js';
+
+// 创建MCP服务器
+const server = createServer();
+
+// 注册所有工具
+registerAllTools(server);
+
+// 使用SSE传输
+createTransport(server, { type: 'sse', port: 3000 });
+
+// 或者使用标准输入/输出传输
+const transport = createTransport(server, { type: 'stdio' });
+await server.connect(transport);
+```
+
+## 工具说明
+
+### 获取图片尺寸（URL）
+通过URL获取图片的宽度、高度和格式信息。
 
 ```json
 {
-  "mcpServers": {
-    "image-tools": {
-      "command": "npx",
-      "args": ["image-tools-mcp"],
-      "env": {
-        "TINIFY_API_KEY": "<YOUR_TINIFY_API_KEY>"
-      }
-    }
+  "name": "get_image_size",
+  "options": {
+    "imageUrl": "https://example.com/image.jpg"
   }
 }
 ```
 
-4. 重启 Claude Desktop
-5. 请求 Claude 获取图片尺寸："告诉我这张图片的尺寸：https://example.com/image.jpg"
-6. 请求 Claude 压缩图片："帮我压缩这张图片：https://example.com/image.jpg"
-7. 请求 Claude 压缩本地图片："帮我压缩这张图片：D:/path/to/image.png？"
-8. 请求 Claude 压缩本地图片："帮我压缩这个文件夹下的图片：D:/imageFolder/"
+### 获取图片尺寸（本地文件）
+获取本地图片文件的宽度、高度和格式信息。
 
-#### 使用 MCP 客户端库
-
-```typescript
-import { McpClient } from "@modelcontextprotocol/client";
-
-// 初始化客户端
-const client = new McpClient({
-  transport: "stdio" // 或其他传输选项
-});
-
-// 连接到服务器
-await client.connect();
-
-// 从 URL 获取图片尺寸
-const urlResult = await client.callTool("get_image_size", {
-  options: {
-    imageUrl: "https://example.com/image.jpg"
-  }
-});
-console.log(JSON.parse(urlResult.content[0].text));
-// 输出: { width: 800, height: 600, type: "jpg", mime: "image/jpeg" }
-
-// 从本地文件获取图片尺寸
-const localResult = await client.callTool("get_local_image_size", {
-  options: {
-    imagePath: "D:/path/to/image.png"
-  }
-});
-console.log(JSON.parse(localResult.content[0].text));
-// 输出: { width: 1024, height: 768, type: "png", mime: "image/png", path: "D:/path/to/image.png" }
-
-// 从 URL 压缩图片
-const compressUrlResult = await client.callTool("compress_image_from_url", {
-  options: {
-    imageUrl: "https://example.com/image.jpg",
-    outputFormat: "webp" // 可选：转换为 webp、jpeg/jpg 或 png
-  }
-});
-console.log(JSON.parse(compressUrlResult.content[0].text));
-// 输出: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", tempFilePath: "/tmp/compressed_1615456789.webp", format: "webp" }
-
-// 压缩本地图片
-const compressLocalResult = await client.callTool("compress_local_image", {
-  options: {
-    imagePath: "D:/path/to/image.png",
-    outputPath: "D:/path/to/compressed.webp", // 可选
-    outputFormat: "image/webp" // 可选：转换为 image/webp、image/jpeg 或 image/png
-  }
-});
-console.log(JSON.parse(compressLocalResult.content[0].text));
-// 输出: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", outputPath: "D:/path/to/compressed.webp", format: "webp" }
-```
-
-### 工具模式
-
-#### get_image_size
-
-```typescript
+```json
 {
-  options: {
-    imageUrl: string // 要获取尺寸的图片 URL
+  "name": "get_local_image_size",
+  "options": {
+    "imagePath": "/path/to/local/image.jpg"
   }
 }
 ```
 
-#### get_local_image_size
+### 压缩图片（URL）
+使用TinyPNG API压缩网络图片。
 
-```typescript
+```json
 {
-  options: {
-    imagePath: string // 本地图片文件的绝对路径
+  "name": "compress_image_from_url",
+  "options": {
+    "imageUrl": "https://example.com/image.jpg",
+    "outputFormat": "webp" // 可选，支持 "webp", "jpeg", "jpg", "png"
   }
 }
 ```
 
-#### compress_image_from_url
+### 压缩图片（本地文件）
+使用TinyPNG API压缩本地图片文件。
 
-```typescript
+```json
 {
-  options: {
-    imageUrl: string // 要压缩的图片 URL
-    outputFormat?: "webp" | "jpeg" | "jpg" | "png" // 可选的输出格式
+  "name": "compress_local_image",
+  "options": {
+    "imagePath": "/path/to/local/image.jpg",
+    "outputPath": "/path/to/output/image.webp", // 可选
+    "outputFormat": "image/webp" // 可选，支持 "image/webp", "image/jpeg", "image/jpg", "image/png"
   }
 }
 ```
-
-#### compress_local_image
-
-```typescript
-{
-  options: {
-    imagePath: string // 本地图片文件的绝对路径
-    outputPath?: string // 可选的压缩后图片的输出绝对路径
-    outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png" // 可选的输出格式
-  }
-}
-```
-
-## 技术实现
-
-本项目基于以下库实现：
-- [probe-image-size](https://github.com/nodeca/probe-image-size) - 用于图片尺寸检测
-- [tinify](https://github.com/tinify/tinify-nodejs) - 通过 TinyPNG API 进行图片压缩
 
 ## 环境变量
 
-- `TINIFY_API_KEY` - 图片压缩功能所需。从 [TinyPNG](https://tinypng.com/developers) 获取您的 API 密钥
+使用TinyPNG压缩功能需要设置API密钥：
 
-## 许可证
+```bash
+export TINIFY_API_KEY="your_api_key_here"
+```
+
+## SSE传输说明
+
+SSE传输允许服务器向客户端实时推送消息。在MCP中，它主要用于以下场景：
+
+1. 服务器需要向客户端推送实时更新
+2. 在网络限制场景下使用
+3. 实现简单的消息更新
+
+通过SSE模式启动后，可以使用提供的HTML客户端页面进行测试，或者创建自己的客户端。
+
+### HTTP端点
+
+- `GET /sse` - 建立SSE连接
+- `POST /messages` - 发送消息到服务器
+- `GET /status` - 检查服务器状态
+
+### 客户端示例
+
+```javascript
+// 连接到SSE流
+const eventSource = new EventSource('/sse');
+
+eventSource.addEventListener('connected', function(e) {
+  console.log('已连接到SSE');
+});
+
+eventSource.addEventListener('message', function(e) {
+  console.log('收到消息:', JSON.parse(e.data));
+});
+
+// 调用工具
+fetch('/messages', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    jsonrpc: "2.0",
+    id: "123",
+    method: "tool/execute",
+    params: {
+      name: "get_image_size",
+      options: {
+        imageUrl: "https://example.com/image.jpg"
+      }
+    }
+  })
+});
+```
+
+## 许可
 
 MIT

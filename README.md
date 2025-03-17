@@ -12,6 +12,7 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 - Compress local images using TinyPNG API
 - Convert images to different formats (webp, jpeg/jpg, png)
 - Returns width, height, type, MIME type, and compression information
+- Support for Server-Sent Events (SSE) mode for web clients
 
 ## Installation
 
@@ -29,6 +30,16 @@ This service provides four tool functions:
 2. `get_local_image_size` - Get dimensions of local images
 3. `compress_image_from_url` - Compress remote images using TinyPNG API
 4. `compress_local_image` - Compress local images using TinyPNG API
+
+### Running in SSE Mode
+
+You can run the service in SSE mode to use it with web clients:
+
+```bash
+npm run start:sse -- --port 9876
+```
+
+Then open http://localhost:9876 in your browser to use the web client.
 
 ### Client Integration
 
@@ -111,7 +122,6 @@ const compressLocalResult = await client.callTool("compress_local_image", {
 });
 console.log(JSON.parse(compressLocalResult.content[0].text));
 // Output: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", outputPath: "D:/path/to/compressed.webp", format: "webp" }
-```
 
 ### Tool Schemas
 
