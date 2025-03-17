@@ -11,6 +11,11 @@
 - 支持标准输入/输出(stdio)传输
 - 支持服务器发送事件(SSE)传输
 
+### 效果展示
+
+![效果图1](./public/image_1.png)
+![效果图2](./public/image_2.png)
+
 ## 安装
 
 ```bash
@@ -77,8 +82,11 @@ await server.connect(transport);
 }
 ```
 
-### 获取图片尺寸（本地文件）
-获取本地图片文件的宽度、高度和格式信息。
+4. 重启 Claude Desktop
+5. 请求 Claude 获取图片尺寸："告诉我这张图片的尺寸：https://example.com/image.jpg"
+6. 请求 Claude 压缩图片："帮我压缩这张图片：https://example.com/image.jpg"
+7. 请求 Claude 压缩本地图片："帮我压缩这张图片：D:/path/to/image.png"
+8. 请求 Claude 压缩本地图片："帮我压缩这个文件夹下的图片：D:/imageFolder/"
 
 ```json
 {

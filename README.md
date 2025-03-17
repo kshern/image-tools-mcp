@@ -14,6 +14,11 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 - Returns width, height, type, MIME type, and compression information
 - Support for Server-Sent Events (SSE) mode for web clients
 
+### Example Results
+
+![Example Result 1](./public/image_1.png)
+![Example Result 2](./public/image_2.png)
+
 ## Installation
 
 ```bash
@@ -66,10 +71,10 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 ```
 
 3. Restart Claude Desktop
-4. Ask Claude to get image dimensions: "Can you tell me the dimensions of this image: https://example.com/image.jpg?"
-5. Ask Claude to compress an image: "Can you compress this image: https://example.com/image.jpg?"
-6. Ask Claude to compress a local image: "Can you compress this image: D:/path/to/image.png?"
-7. Ask Claude to compress a local image folder: "Can you compress this folder: D:/imageFolder?"
+4. Ask Claude to get image dimensions: "Can you tell me the dimensions of this image: https://example.com/image.jpg"
+5. Ask Claude to compress an image: "Can you compress this image: https://example.com/image.jpg"
+6. Ask Claude to compress a local image: "Can you compress this image: D:/path/to/image.png"
+7. Ask Claude to compress a local image folder: "Can you compress this folder: D:/imageFolder"
 
 #### Using with MCP Client Library
 
@@ -151,7 +156,7 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 {
   options: {
     imageUrl: string // URL of the image to compress
-    outputFormat?: "webp" | "jpeg" | "jpg" | "png" // Optional output format
+    outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png" // Optional output format
   }
 }
 ```

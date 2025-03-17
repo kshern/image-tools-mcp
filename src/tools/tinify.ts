@@ -3,8 +3,6 @@ import tinify from "tinify";
 import fs from "fs";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import path from "path";
-import os from "os";
-
 /**
  * 设置TinyPNG API密钥
  * @param apiKey 可选的API密钥，如果未提供则从环境变量获取
@@ -37,7 +35,7 @@ export const registerCompressImageFromUrlTool = (server: McpServer) => {
       try {
         const { imageUrl, outputFormat, apiKey } = options as { 
           imageUrl: string;
-          outputFormat?: "webp" | "jpeg" | "jpg" | "png";
+          outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
           apiKey?: string;
         };
 
@@ -49,10 +47,9 @@ export const registerCompressImageFromUrlTool = (server: McpServer) => {
 
         // 如果指定了输出格式，则转换格式
         if (outputFormat) {
-          // 将输出格式转换为tinify需要的格式
-          const format = outputFormat === "jpg" ? "jpeg" : outputFormat;
-          // 使用类型断言处理类型不匹配的问题
-          source = source.convert({ type: format as any });
+          // 使用类型断言来避免类型错误
+          const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
+          source = source.convert(convertOptions as any);
         }
 
         // 获取压缩后的图片数据
@@ -70,7 +67,7 @@ export const registerCompressImageFromUrlTool = (server: McpServer) => {
         // 确定MIME类型
         let mimeType = "image/jpeg"; // 默认MIME类型
         if (outputFormat) {
-          mimeType = `image/${outputFormat === "jpg" ? "jpeg" : outputFormat}`;
+          mimeType = `image/${outputFormat === "image/jpg" ? "jpeg" : outputFormat}`;
         }
 
         return {
