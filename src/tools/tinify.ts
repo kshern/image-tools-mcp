@@ -35,7 +35,7 @@ export const registerCompressImageFromUrlTool = (server: McpServer) => {
 
         const { imageUrl, outputFormat } = options as { 
           imageUrl: string;
-          outputFormat?: "webp" | "jpeg" | "jpg" | "png";
+          outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
         };
 
         // 从URL获取图片并压缩
@@ -44,7 +44,7 @@ export const registerCompressImageFromUrlTool = (server: McpServer) => {
         // 如果指定了输出格式，则转换格式
         if (outputFormat) {
           // 使用类型断言来避免类型错误
-          const convertOptions = { type: outputFormat === "jpg" ? "jpeg" : outputFormat };
+          const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
           source = source.convert(convertOptions as any);
         }
 
