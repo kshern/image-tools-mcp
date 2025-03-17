@@ -145,7 +145,7 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 {
   options: {
     imageUrl: string // URL of the image to compress
-    outputFormat?: "webp" | "jpeg" | "jpg" | "png" // Optional output format
+    outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png" // Optional output format
   }
 }
 ```

@@ -144,7 +144,7 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 {
   options: {
     imageUrl: string // 要压缩的图片 URL
-    outputFormat?: "webp" | "jpeg" | "jpg" | "png" // 可选的输出格式
+    outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png" // 可选的输出格式
   }
 }
 ```
