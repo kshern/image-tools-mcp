@@ -55,7 +55,7 @@ npm install image-tools-mcp
 4. 重启 Claude Desktop
 5. 请求 Claude 获取图片尺寸："告诉我这张图片的尺寸：https://example.com/image.jpg"
 6. 请求 Claude 压缩图片："帮我压缩这张图片：https://example.com/image.jpg"
-7. 请求 Claude 压缩本地图片："帮我压缩这张图片：D:/path/to/image.png？"
+7. 请求 Claude 压缩本地图片："帮我压缩这张图片：D:/path/to/image.png"
 8. 请求 Claude 压缩本地图片："帮我压缩这个文件夹下的图片：D:/imageFolder/"
 
 #### 使用 MCP 客户端库

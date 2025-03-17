@@ -27,6 +27,23 @@ export const createServer = () => {
               })
               .describe("Options for retrieving local image size"),
           },
+          compress_image_from_url: {
+            options: z
+              .object({
+                imageUrl: z.string().describe("URL of the image to compress (must be a direct link to an image file)"),
+                outputFormat: z.enum(["webp", "jpeg", "jpg", "png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
+              })
+              .describe("Options for compressing image from URL"),
+          },
+          compress_local_image: {
+            options: z
+              .object({
+                imagePath: z.string().describe("Absolute path to the local image file (must be a file, not a directory)"),
+                outputPath: z.string().optional().describe("Absolute path for the compressed output image"),
+                outputFormat: z.enum(["image/webp", "image/jpeg", "image/jpg", "image/png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
+              })
+              .describe("Options for compressing local image"),
+          },
         },
       },
     }
