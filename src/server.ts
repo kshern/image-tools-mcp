@@ -3,14 +3,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 // 导入 package.json 中的版本信息
-import { version } from "../package.json";
+import packageJson from "../package.json" with { type: "json" };
 
 // 创建并配置 MCP 服务器
 export const createServer = () => {
   const server = new McpServer(
     {
-      name: "image-tools-mcp",
-      version,
+      name: "image-tools-mcp-server",
+      version: packageJson.version, // 使用 package.json 中的版本号
     },
     {
       capabilities: {
