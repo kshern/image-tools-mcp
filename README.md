@@ -18,11 +18,6 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 ![Example Result 1](./public/image_1.png)
 ![Example Result 2](./public/image_2.png)
 
-## Installation
-
-```bash
-npm install image-tools-mcp
-```
 
 ## Usage
 

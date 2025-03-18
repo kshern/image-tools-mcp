@@ -16,11 +16,6 @@
 ![效果图1](./public/image_1.png)
 ![效果图2](./public/image_2.png)
 
-## 安装
-
-```bash
-npm install image-tools-mcp
-```
 
 ## 使用方法
 
