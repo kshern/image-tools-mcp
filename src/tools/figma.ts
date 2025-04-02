@@ -55,9 +55,9 @@ export async function getFigmaImages(
   try {
     // 从 URL 中提取参数
     const { fileKey, nodeId } = extractFigmaParams(figmaUrl);
-    const figmaToken = process.env.FIGMA_TOKEN;
+    const figmaToken = process.env.FIGMA_API_TOKEN;
     if (!figmaToken) {
-      throw new Error("FIGMA_TOKEN 环境变量未设置");
+      throw new Error("FIGMA_API_TOKEN 环境变量未设置");
     }
 
     // 确定要请求的节点 ID

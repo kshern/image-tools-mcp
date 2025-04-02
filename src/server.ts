@@ -129,7 +129,7 @@ export const createServer = () => {
       options: z
         .object({
           imageUrl: z.string().describe("URL of the image to compress (must be a direct link to an image file)"),
-          outputFormat: z.enum(["webp", "jpeg", "jpg", "png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
+          outputFormat: z.enum(["image/webp", "image/jpeg", "image/jpg", "image/png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
         })
         .describe("Options for compressing image from URL"),
     },
@@ -137,7 +137,7 @@ export const createServer = () => {
       try {
         const { imageUrl, outputFormat } = options as { 
           imageUrl: string;
-          outputFormat?: "webp" | "jpeg" | "jpg" | "png";
+          outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
         };
         
         // Call tool function implementation

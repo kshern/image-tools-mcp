@@ -16,7 +16,7 @@ const setTinifyApiKey = () => {
 // 从URL压缩图片的纯函数实现
 export async function compressImageFromUrl(
   imageUrl: string, 
-  outputFormat?: "webp" | "jpeg" | "jpg" | "png"
+  outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png"
 ) {
   // 设置API密钥
   setTinifyApiKey();
@@ -27,7 +27,7 @@ export async function compressImageFromUrl(
   // 如果指定了输出格式，则转换格式
   if (outputFormat) {
     // 使用类型断言来避免类型错误
-    const convertOptions = { type: outputFormat === "jpg" ? "jpeg" : outputFormat };
+    const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
     source = source.convert(convertOptions as any);
   }
 
