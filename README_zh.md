@@ -17,6 +17,9 @@
 ![效果图2](./public/image_2.png)
 
 
+
+![效果图3](./public/image_figma_url.png)
+
 ## 使用方法
 
 ### 作为 MCP 服务使用
@@ -27,6 +30,7 @@
 2. `get_local_image_size` - 获取本地图片尺寸
 3. `compress_image_from_url` - 使用 TinyPNG API 压缩远程图片
 4. `compress_local_image` - 使用 TinyPNG API 压缩本地图片
+5. `figma` - 从 Figma API 获取图片链接并压缩
 
 ### 客户端集成
 
