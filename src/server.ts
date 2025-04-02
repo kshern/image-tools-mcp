@@ -129,19 +129,21 @@ export const createServer = () => {
       options: z
         .object({
           imageUrl: z.string().describe("URL of the image to compress (must be a direct link to an image file)"),
+          outputPath: z.string().optional().describe("Absolute path for the compressed output image"),
           outputFormat: z.enum(["image/webp", "image/jpeg", "image/jpg", "image/png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
         })
         .describe("Options for compressing image from URL"),
     },
     async ({ options = {} }) => {
       try {
-        const { imageUrl, outputFormat } = options as { 
+        const { imageUrl, outputPath, outputFormat } = options as { 
           imageUrl: string;
+          outputPath?: string;
           outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
         };
         
         // Call tool function implementation
-        const result = await compressImageFromUrl(imageUrl, outputFormat);
+        const result = await compressImageFromUrl(imageUrl, outputPath, outputFormat);
         
         return {
           content: [

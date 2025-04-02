@@ -16,6 +16,7 @@ const setTinifyApiKey = () => {
 // 从URL压缩图片的纯函数实现
 export async function compressImageFromUrl(
   imageUrl: string, 
+  outputPath?: string,
   outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png"
 ) {
   // 设置API密钥
@@ -44,20 +45,24 @@ export async function compressImageFromUrl(
   const originalSize = (await fetch(imageUrl).then(res => res.arrayBuffer())).byteLength;
   const compressedSize = resultData.length;
   const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
-
+  
   // 创建临时文件保存压缩后的图片
   const tempDir = os.tmpdir();
   const originalFilename = new URL(imageUrl).pathname.split("/").pop() || "image";
   const extension = outputFormat || path.extname(originalFilename).slice(1) || "jpg";
   const tempFilePath = path.join(tempDir, `compressed_${Date.now()}.${extension}`);
   
-  fs.writeFileSync(tempFilePath, resultData);
+  if (outputPath) {
+    fs.writeFileSync(outputPath, resultData);
+  } else {
+    fs.writeFileSync(tempFilePath, resultData);
+  }
 
   return {
     originalSize,
     compressedSize,
     compressionRatio: `${compressionRatio}%`,
-    tempFilePath,
+    outputPath: outputPath || tempFilePath,
     format: extension,
   };
 }
