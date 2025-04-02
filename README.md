@@ -23,12 +23,13 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 
 ### Using as an MCP Service
 
-This service provides four tool functions:
+This service provides five tool functions:
 
 1. `get_image_size` - Get dimensions of remote images
 2. `get_local_image_size` - Get dimensions of local images
 3. `compress_image_from_url` - Compress remote images using TinyPNG API
 4. `compress_local_image` - Compress local images using TinyPNG API
+5. `figma` - Fetch image links from Figma API and compress them using TinyPNG API
 
 ### Client Integration
 
@@ -59,6 +60,7 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 5. Ask Claude to compress an image: "Can you compress this image: https://example.com/image.jpg"
 6. Ask Claude to compress a local image: "Can you compress this image: D:/path/to/image.png"
 7. Ask Claude to compress a local image folder: "Can you compress this folder: D:/imageFolder"
+8. Ask Claude to fetch image links from Figma API: "Can you fetch image links from Figma API: https://www.figma.com/file/XXXXXXX"
 
 #### Using with MCP Client Library
 
@@ -112,6 +114,16 @@ const compressLocalResult = await client.callTool("compress_local_image", {
 console.log(JSON.parse(compressLocalResult.content[0].text));
 // Output: { originalSize: 102400, compressedSize: 51200, compressionRatio: "50.00%", outputPath: "D:/path/to/compressed.webp", format: "webp" }
 
+// Fetch image links from Figma API
+
+const figmaResult = await client.callTool("figma", {
+  options: {
+    figmaUrl: "https://www.figma.com/file/XXXXXXX"
+  }
+});
+console.log(JSON.parse(figmaResult.content[0].text));
+// Output: { imageLinks: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"] }
+
 ### Tool Schemas
 
 #### get_image_size
@@ -157,11 +169,22 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 }
 ```
 
+#### figma
+
+```typescript
+{
+  options: {
+    figmaUrl: string // URL of the Figma file to fetch image links from
+  }
+}
+```
+
 ## Technical Implementation
 
 This project is built on the following libraries:
 - [probe-image-size](https://github.com/nodeca/probe-image-size) - For image dimension detection
 - [tinify](https://github.com/tinify/tinify-nodejs) - For image compression via the TinyPNG API
+- [figma-api](https://github.com/figma/api) - For fetching image links from Figma API
 
 ## Environment Variables
 

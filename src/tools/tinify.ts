@@ -1,7 +1,5 @@
-import { z } from "zod";
 import tinify from "tinify";
 import fs from "fs";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import path from "path";
 import os from "os";
 
@@ -10,168 +8,113 @@ const setTinifyApiKey = () => {
   // 从环境变量获取API密钥
   const apiKey = process.env.TINIFY_API_KEY;
   if (!apiKey) {
-    throw new Error("TINIFY_API_KEY environment variable is not set");
+    throw new Error("TINIFY_API_KEY 环境变量未设置");
   }
   tinify.key = apiKey;
 };
 
-// 从URL压缩图片的工具函数
-export const registerCompressImageFromUrlTool = (server: McpServer) => {
-  server.tool(
-    "compress_image_from_url",
-    "Compress a single image from URL using TinyPNG API (only supports image files, not folders)",
-    {
-      options: z
-        .object({
-          imageUrl: z.string().describe("URL of the image to compress (must be a direct link to an image file)"),
-          outputFormat: z.enum(["webp", "jpeg", "jpg", "png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
-        })
-        .describe("Options for compressing image from URL"),
-    },
-    async ({ options = {} }) => {
-      try {
-        // 设置API密钥
-        setTinifyApiKey();
+// 从URL压缩图片的纯函数实现
+export async function compressImageFromUrl(
+  imageUrl: string, 
+  outputFormat?: "webp" | "jpeg" | "jpg" | "png"
+) {
+  // 设置API密钥
+  setTinifyApiKey();
 
-        const { imageUrl, outputFormat } = options as { 
-          imageUrl: string;
-          outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
-        };
+  // 从URL获取图片并压缩
+  let source = tinify.fromUrl(imageUrl);
 
-        // 从URL获取图片并压缩
-        let source = tinify.fromUrl(imageUrl);
+  // 如果指定了输出格式，则转换格式
+  if (outputFormat) {
+    // 使用类型断言来避免类型错误
+    const convertOptions = { type: outputFormat === "jpg" ? "jpeg" : outputFormat };
+    source = source.convert(convertOptions as any);
+  }
 
-        // 如果指定了输出格式，则转换格式
-        if (outputFormat) {
-          // 使用类型断言来避免类型错误
-          const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
-          source = source.convert(convertOptions as any);
-        }
+  // 获取压缩后的图片数据
+  const resultData = await new Promise<Buffer>((resolve, reject) => {
+    source.toBuffer(function(err: any, data: any) {
+      if (err) reject(err);
+      else if (data) resolve(Buffer.from(data));
+      else reject(new Error('没有从tinify返回数据'));
+    });
+  });
 
-        // 获取压缩后的图片数据
-        const resultData = await new Promise<Buffer>((resolve, reject) => {
-          source.toBuffer(function(err: any, data: any) {
-            if (err) reject(err);
-            else if (data) resolve(Buffer.from(data));
-            else reject(new Error('No data returned from tinify'));
-          });
-        });
+  // 计算压缩率
+  const originalSize = (await fetch(imageUrl).then(res => res.arrayBuffer())).byteLength;
+  const compressedSize = resultData.length;
+  const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
 
-        // 计算压缩率
-        const originalSize = (await fetch(imageUrl).then(res => res.arrayBuffer())).byteLength;
-        const compressedSize = resultData.length;
-        const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+  // 创建临时文件保存压缩后的图片
+  const tempDir = os.tmpdir();
+  const originalFilename = new URL(imageUrl).pathname.split("/").pop() || "image";
+  const extension = outputFormat || path.extname(originalFilename).slice(1) || "jpg";
+  const tempFilePath = path.join(tempDir, `compressed_${Date.now()}.${extension}`);
+  
+  fs.writeFileSync(tempFilePath, resultData);
 
-        // 创建临时文件保存压缩后的图片
-        const tempDir = os.tmpdir();
-        const originalFilename = new URL(imageUrl).pathname.split("/").pop() || "image";
-        const extension = outputFormat || path.extname(originalFilename).slice(1) || "jpg";
-        const tempFilePath = path.join(tempDir, `compressed_${Date.now()}.${extension}`);
-        
-        fs.writeFileSync(tempFilePath, resultData);
+  return {
+    originalSize,
+    compressedSize,
+    compressionRatio: `${compressionRatio}%`,
+    tempFilePath,
+    format: extension,
+  };
+}
 
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({
-                originalSize,
-                compressedSize,
-                compressionRatio: `${compressionRatio}%`,
-                tempFilePath,
-                format: extension,
-              }, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        throw new Error(`Failed to compress image: ${(error as Error).message}`);
-      }
-    }
-  );
-};
+// 从本地文件压缩图片的纯函数实现
+export async function compressLocalImage(
+  imagePath: string,
+  outputPath?: string,
+  outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png"
+) {
+  // 设置API密钥
+  setTinifyApiKey();
 
-// 从本地文件压缩图片的工具函数
-export const registerCompressLocalImageTool = (server: McpServer) => {
-  server.tool(
-    "compress_local_image",
-    "Compress a single local image file using TinyPNG API (only supports image files, not folders)",
-    {
-      options: z
-        .object({
-          imagePath: z.string().describe("Absolute path to the local image file (must be a file, not a directory)"),
-          outputPath: z.string().optional().describe("Absolute path for the compressed output image"),
-          outputFormat: z.enum(["image/webp", "image/jpeg", "image/jpg", "image/png"]).optional().describe("Output format (webp, jpeg/jpg, png)"),
-        })
-        .describe("Options for compressing local image"),
-    },
-    async ({ options = {} }) => {
-      try {
-        // 设置API密钥
-        setTinifyApiKey();
+  // 检查文件是否存在
+  if (!fs.existsSync(imagePath)) {
+    throw new Error(`文件不存在: ${imagePath}`);
+  }
 
-        const { imagePath, outputPath, outputFormat } = options as { 
-          imagePath: string;
-          outputPath?: string;
-          outputFormat?: "image/webp" | "image/jpeg" | "image/jpg" | "image/png";
-        };
+  // 获取原始文件大小
+  const originalSize = fs.statSync(imagePath).size;
 
-        // 检查文件是否存在
-        if (!fs.existsSync(imagePath)) {
-          throw new Error(`File does not exist: ${imagePath}`);
-        }
+  // 从本地文件压缩图片
+  let source = tinify.fromFile(imagePath);
 
-        // 获取原始文件大小
-        const originalSize = fs.statSync(imagePath).size;
+  // 如果指定了输出格式，则转换格式
+  if (outputFormat) {
+    // 使用类型断言来避免类型错误
+    const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
+    source = source.convert(convertOptions as any);
+  }
 
-        // 从本地文件压缩图片
-        let source = tinify.fromFile(imagePath);
+  // 确定输出路径
+  let finalOutputPath = outputPath;
+  if (!finalOutputPath) {
+    const dir = path.dirname(imagePath);
+    const ext = outputFormat ? outputFormat.split('/')[1] : path.extname(imagePath).slice(1) || "jpg";
+    const basename = path.basename(imagePath, path.extname(imagePath));
+    finalOutputPath = path.join(dir, `${basename}_compressed.${ext}`);
+  }
 
-        // 如果指定了输出格式，则转换格式
-        if (outputFormat) {
-          // 使用类型断言来避免类型错误
-          const convertOptions = { type: outputFormat === "image/jpg" ? "image/jpeg" : outputFormat };
-          source = source.convert(convertOptions as any);
-        }
+  // 保存压缩后的图片
+  await new Promise<void>((resolve, reject) => {
+    source.toFile(finalOutputPath, function(err: any) {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
 
-        // 确定输出路径
-        let finalOutputPath = outputPath;
-        if (!finalOutputPath) {
-          const dir = path.dirname(imagePath);
-          const ext = outputFormat || path.extname(imagePath).slice(1) || "image/jpg";
-          const basename = path.basename(imagePath, path.extname(imagePath));
-          finalOutputPath = path.join(dir, `${basename}_compressed.${ext}`);
-        }
+  // 获取压缩后的文件大小
+  const compressedSize = fs.statSync(finalOutputPath).size;
+  const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
 
-        // 保存压缩后的图片
-        await new Promise<void>((resolve, reject) => {
-          source.toFile(finalOutputPath, function(err: any) {
-            if (err) reject(err);
-            else resolve();
-          });
-        });
-
-        // 获取压缩后的文件大小
-        const compressedSize = fs.statSync(finalOutputPath).size;
-        const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
-
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify({
-                originalSize,
-                compressedSize,
-                compressionRatio: `${compressionRatio}%`,
-                outputPath: finalOutputPath,
-                format: outputFormat || path.extname(finalOutputPath).slice(1),
-              }, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        throw new Error(`Failed to compress local image: ${(error as Error).message}`);
-      }
-    }
-  );
-};
+  return {
+    originalSize,
+    compressedSize,
+    compressionRatio: `${compressionRatio}%`,
+    outputPath: finalOutputPath,
+    format: outputFormat ? outputFormat.split('/')[1] : path.extname(finalOutputPath).slice(1),
+  };
+}

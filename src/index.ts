@@ -2,17 +2,13 @@
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./server.js";
-import { registerAllTools } from "./tools/index.js";
 
 /**
  * 主函数 - 创建并启动MCP服务器
  */
 async function main() {
-  // 创建服务器实例
+  // 创建服务器实例（已包含所有工具注册）
   const server = createServer();
-  
-  // 注册所有工具
-  registerAllTools(server);
   
   // 连接到标准输入/输出传输
   const transport = new StdioServerTransport();
