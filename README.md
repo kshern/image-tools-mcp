@@ -18,6 +18,9 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 ![Example Result 1](./public/image_1.png)
 ![Example Result 2](./public/image_2.png)
 
+download from figma url and compress
+![Example Result 3](./public/image_figma_url.png)
+
 
 ## Usage
 

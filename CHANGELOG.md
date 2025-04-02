@@ -1,3 +1,7 @@
+## [0.0.6] - 2025-04-02
+### Added
+- tinypng form url bugfix
+
 ## [0.0.5] - 2025-04-02
 ### Added
 - tinypng type fix
