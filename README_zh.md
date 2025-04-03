@@ -49,7 +49,8 @@
       "command": "npx",
       "args": ["image-tools-mcp"],
       "env": {
-        "TINIFY_API_KEY": "<YOUR_TINIFY_API_KEY>"
+        "TINIFY_API_KEY": "<YOUR_TINIFY_API_KEY>",
+        "FIGMA_API_TOKEN": "<YOUR_FIGMA_API_TOKEN>"
       }
     }
   }
@@ -169,6 +170,7 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 ## 环境变量
 
 - `TINIFY_API_KEY` - 图片压缩功能所需。从 [TinyPNG](https://tinypng.com/developers) 获取您的 API 密钥
+- `FIGMA_API_TOKEN` - Figma API 访问令牌。从 [Figma](https://www.figma.com/developers) 获取您的 API 密钥
 
 ## 许可证
 

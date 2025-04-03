@@ -51,7 +51,8 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
       "command": "npx",
       "args": ["image-tools-mcp"],
       "env": {
-        "TINIFY_API_KEY": "<YOUR_TINIFY_API_KEY>"
+        "TINIFY_API_KEY": "<YOUR_TINIFY_API_KEY>",
+        "FIGMA_API_TOKEN": "<YOUR_FIGMA_API_TOKEN>"
       }
     }
   }
@@ -192,6 +193,7 @@ This project is built on the following libraries:
 ## Environment Variables
 
 - `TINIFY_API_KEY` - Required for image compression functionality. Get your API key from [TinyPNG](https://tinypng.com/developers)
+- `FIGMA_API_TOKEN` - Required for fetching image links from Figma API. Get your API token from [Figma](https://www.figma.com/developers)
 
 ## License
 
