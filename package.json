@@ -1,6 +1,6 @@
 {
   "name": "image-tools-mcp",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A Model Context Protocol (MCP) service for retrieving image dimensions, supporting both URL and local file sources.",
   "type": "module",
   "main": "dist/index.js",
@@ -50,7 +50,7 @@
   },
   "homepage": "https://github.com/kshern/image-tools-mcp#readme",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.5.0",

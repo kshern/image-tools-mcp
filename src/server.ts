@@ -2,8 +2,6 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-// Import version information from package.json
-import packageJson from "../package.json" with { type: "json" };
 // Import tool function implementations
 import { getImageSizeFromUrl, getLocalImageSize, compressImageFromUrl, compressLocalImage, getFigmaImages } from "./tools/index.js";
 
@@ -12,7 +10,7 @@ export const createServer = () => {
   const server = new McpServer(
     {
       name: "image-tools-mcp-server",
-      version: packageJson.version, // Use the version from package.json
+      version: "0.0.7", // Use the version from package.json
     },
     {
       capabilities: {
