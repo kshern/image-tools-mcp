@@ -10,7 +10,7 @@ export const createServer = () => {
   const server = new McpServer(
     {
       name: "image-tools-mcp-server",
-      version: "0.0.7", // Use the version from package.json
+      version: "0.0.8", // Use the version from package.json
     },
     {
       capabilities: {
@@ -198,14 +198,14 @@ export const createServer = () => {
   // Register tool to get images from Figma API
   server.tool(
     "get_figma_images",
-    "Get images from Figma API and compress them using TinyPNG API",
+    "Get images from Figma API",
     {
       options: z
         .object({
           figmaUrl: z.string().describe("Figma design link, e.g. https://www.figma.com/design/fileKey/title?node-id=nodeId"),
           nodeIds: z.array(z.string()).optional().describe("Optional array of node IDs, if not provided, use the nodeId extracted from the URL"),
         })
-        .describe("Options for getting images from Figma API"),
+        .describe("Options for getting images from Figma API, e.g. https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/imageId"),
     },
     async ({ options = {} }) => {
       try {
