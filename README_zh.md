@@ -170,7 +170,11 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 ## 环境变量
 
 - `TINIFY_API_KEY` - 图片压缩功能所需。从 [TinyPNG](https://tinypng.com/developers) 获取您的 API 密钥
+  - 未提供时，压缩工具 (`compress_image_from_url` 和 `compress_local_image`) 将不会被注册
 - `FIGMA_API_TOKEN` - Figma API 访问令牌。从 [Figma](https://www.figma.com/developers) 获取您的 API 密钥
+  - 未提供时，Figma 工具 (`get_figma_images`) 将不会被注册
+
+注意：基础图片尺寸工具 (`get_image_size` 和 `get_local_image_size`) 始终可用，不受 API 密钥影响。
 
 ## 许可证
 

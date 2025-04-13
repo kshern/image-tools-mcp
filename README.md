@@ -193,7 +193,11 @@ This project is built on the following libraries:
 ## Environment Variables
 
 - `TINIFY_API_KEY` - Required for image compression functionality. Get your API key from [TinyPNG](https://tinypng.com/developers)
+  - When not provided, the compression tools (`compress_image_from_url` and `compress_local_image`) will not be registered
 - `FIGMA_API_TOKEN` - Required for fetching image links from Figma API. Get your API token from [Figma](https://www.figma.com/developers)
+  - When not provided, the Figma tool (`figma`) will not be registered
+
+Note: The basic image dimension tools (`get_image_size` and `get_local_image_size`) are always available regardless of API keys.
 
 ## License
 
