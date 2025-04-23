@@ -19,7 +19,12 @@
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{md,json,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{md,json,yml,yaml}\"",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "mcp",
@@ -63,6 +68,13 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/probe-image-size": "^7.2.5"
+    "@types/probe-image-size": "^7.2.5",
+    "@typescript-eslint/eslint-plugin": "^8.31.0",
+    "@typescript-eslint/parser": "^8.31.0",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "husky": "^9.1.7",
+    "prettier": "^3.5.3"
   }
 }

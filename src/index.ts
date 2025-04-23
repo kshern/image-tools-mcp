@@ -9,7 +9,7 @@ import { createServer } from "./server.js";
 async function main() {
   // 创建服务器实例（已包含所有工具注册）
   const server = createServer();
-  
+
   // 连接到标准输入/输出传输
   const transport = new StdioServerTransport();
   await server.connect(transport);

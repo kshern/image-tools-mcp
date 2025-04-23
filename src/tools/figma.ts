@@ -50,7 +50,7 @@ export function extractFigmaParams(figmaUrl: string): {
  */
 export async function getFigmaImages(
   figmaUrl: string,
-  nodeIds?: string[]
+  nodeIds?: string[],
 ): Promise<{ images: Record<string, string | null>; err?: string }> {
   try {
     // 从 URL 中提取参数
@@ -69,7 +69,7 @@ export async function getFigmaImages(
 
     // 构建 API URL
     const apiUrl = `https://api.figma.com/v1/images/${fileKey}?ids=${idsToFetch.join(
-      ","
+      ",",
     )}`;
 
     // 发起请求
@@ -108,11 +108,10 @@ export async function getFigmaImages(
  */
 export async function downloadFigmaImage(
   imageUrl: string,
-  outputPath: string
+  outputPath: string,
 ): Promise<{ success: boolean; path?: string; error?: string }> {
   try {
     const fs = await import("fs");
-    const { Readable } = await import("stream");
     const { finished } = await import("stream/promises");
 
     // 发起请求获取图片
@@ -126,7 +125,10 @@ export async function downloadFigmaImage(
     const fileStream = fs.createWriteStream(outputPath);
 
     // 将响应体作为流传输到文件
-    await finished(Readable.fromWeb(response.body as any).pipe(fileStream));
+    // 使用 unknown 作为中间类型，避免类型错误
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const readableStream = (await import("stream")).Readable.from(buffer);
+    await finished(readableStream.pipe(fileStream));
 
     return {
       success: true,
