@@ -2,7 +2,7 @@
 
 A Model Context Protocol (MCP) service for retrieving image dimensions and compressing images, supporting both URL and local file sources.
 
-*[中文文档](./README_zh.md)*
+_[中文文档](./README_zh.md)_
 
 ## Features
 
@@ -20,7 +20,6 @@ A Model Context Protocol (MCP) service for retrieving image dimensions and compr
 
 download from figma url and compress
 ![Example Result 3](./public/image_figma_url.png)
-
 
 ## Usage
 
@@ -68,7 +67,7 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 
 #### Using with MCP Client Library
 
-```typescript
+````typescript
 import { McpClient } from "@modelcontextprotocol/client";
 
 // Initialize the client
@@ -138,14 +137,14 @@ console.log(JSON.parse(figmaResult.content[0].text));
     imageUrl: string // URL of the image to retrieve dimensions for
   }
 }
-```
+````
 
 #### get_local_image_size
 
 ```typescript
 {
   options: {
-    imagePath: string // Absolute path to the local image file
+    imagePath: string; // Absolute path to the local image file
   }
 }
 ```
@@ -178,7 +177,7 @@ console.log(JSON.parse(figmaResult.content[0].text));
 ```typescript
 {
   options: {
-    figmaUrl: string // URL of the Figma file to fetch image links from
+    figmaUrl: string; // URL of the Figma file to fetch image links from
   }
 }
 ```
@@ -186,6 +185,7 @@ console.log(JSON.parse(figmaResult.content[0].text));
 ## Technical Implementation
 
 This project is built on the following libraries:
+
 - [probe-image-size](https://github.com/nodeca/probe-image-size) - For image dimension detection
 - [tinify](https://github.com/tinify/tinify-nodejs) - For image compression via the TinyPNG API
 - [figma-api](https://github.com/figma/api) - For fetching image links from Figma API
