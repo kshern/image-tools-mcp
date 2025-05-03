@@ -1,0 +1,22 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required: []
+    properties:
+      tinifyApiKey:
+        type: string
+        description: TinyPNG API key for image compression
+      figmaApiToken:
+        type: string
+        description: Figma API token for figma tool
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'node', args: ['dist/index.js'], env: { ...(config.tinifyApiKey ? { TINIFY_API_KEY: config.tinifyApiKey } : {}), ...(config.figmaApiToken ? { FIGMA_API_TOKEN: config.figmaApiToken } : {}) } })
+  exampleConfig:
+    tinifyApiKey: YOUR_TINIFY_API_KEY
+    figmaApiToken: YOUR_FIGMA_API_TOKEN
