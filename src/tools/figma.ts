@@ -42,60 +42,181 @@ export function extractFigmaParams(figmaUrl: string): {
   }
 }
 
+// 定义 Figma API 的基础 URL
+const FIGMA_API_BASE_URL = "https://api.figma.com/v1";
+
+// 定义 Figma API 错误响应类型
+interface FigmaApiError {
+  err: string;
+  status?: number; // 有时 API 会在 err 平级返回 status
+}
+
+// 定义 Figma API 成功获取图像的响应类型
+interface FigmaImageResponse {
+  images: { [nodeId: string]: string | null };
+  err?: string; // 成功响应也可能带有 err 字段，尽管通常是 null 或 undefined
+}
+
+// 定义 getImage 函数的参数类型接口
+interface GetImageParams {
+  fileKey: string;
+  nodeIds: string[]; // 节点 ID 数组
+  figmaToken: string; // Figma API 访问令牌
+  scale?: number; // 图像缩放比例
+  format?: "jpg" | "png" | "svg" | "pdf"; // 图像格式
+  svg_include_id?: boolean; // SVG 是否包含 ID
+  svg_simplify_stroke?: boolean; // SVG 是否简化描边
+  use_absolute_bounds?: boolean; // 是否使用绝对边界
+  version?: string; // 文件版本
+}
+
+/**
+ * 从 Figma API 获取图像 URL。
+ * @param params - 包含 fileKey, nodeIds 和 figmaToken 的对象。
+ * @returns 返回一个包含图像 URL 的 Promise。
+ * @throws 如果 API 请求失败，则抛出错误。
+ */
+export async function getImage(
+  params: GetImageParams,
+): Promise<{ [nodeId: string]: string | null }> {
+  const {
+    fileKey,
+    nodeIds,
+    figmaToken,
+    scale,
+    format,
+    svg_include_id,
+    svg_simplify_stroke,
+    use_absolute_bounds,
+    version,
+  } = params;
+  // 构建 API 请求 URL，包含节点 ID
+  let apiUrl = `${FIGMA_API_BASE_URL}/images/${fileKey}?ids=${nodeIds.join(",")}`;
+
+  // 添加可选参数到 URL
+  if (scale !== undefined) {
+    apiUrl += `&scale=${scale}`;
+  }
+  if (format !== undefined) {
+    apiUrl += `&format=${format}`;
+  }
+  if (svg_include_id !== undefined && format === "svg") {
+    apiUrl += `&svg_include_id=${svg_include_id}`;
+  }
+  if (svg_simplify_stroke !== undefined && format === "svg") {
+    apiUrl += `&svg_simplify_stroke=${svg_simplify_stroke}`;
+  }
+  if (use_absolute_bounds !== undefined) {
+    apiUrl += `&use_absolute_bounds=${use_absolute_bounds}`;
+  }
+  if (version !== undefined) {
+    apiUrl += `&version=${version}`;
+  }
+
+  // 发起 API 请求
+  const response = await fetch(apiUrl, {
+    method: "GET", // HTTP 请求方法
+    headers: {
+      "X-FIGMA-TOKEN": figmaToken, // Figma API 访问令牌
+    },
+  });
+
+  // 检查响应状态
+  if (!response.ok) {
+    // 如果响应状态不为 OK，则抛出错误
+    const errorData = (await response.json()) as FigmaApiError;
+    throw new Error(
+      `Figma API request failed with status ${response.status}: ${errorData.err}`,
+    );
+  }
+
+  // 解析响应数据为 JSON 格式
+  const data = (await response.json()) as FigmaImageResponse;
+  // 检查返回数据中是否包含错误信息
+  if (data.err) {
+    // 如果包含错误信息，则抛出错误
+    throw new Error(`Figma API error: ${data.err}`);
+  }
+  // 返回图像数据
+  return data.images;
+}
+
 /**
  * 从 Figma API 获取图片信息
  * @param figmaUrl - Figma 设计链接
- * @param nodeIds - 可选的节点 ID 数组，如果不提供则使用从 URL 中提取的 nodeId
- * @returns 包含图片 URL 的对象
+ * @param nodeIds - 可选的节点 ID 数组。
+ * @param scale - 图像缩放比例
+ * @param format - 图像格式
+ * @param svg_include_id - SVG 是否包含 ID
+ * @param svg_simplify_stroke - SVG 是否简化描边
+ * @param use_absolute_bounds - 是否使用绝对边界
+ * @param version - 文件版本
+ * @returns 返回一个包含图片信息或错误信息的对象。
  */
 export async function getFigmaImages(
   figmaUrl: string,
   nodeIds?: string[],
-): Promise<{ images: Record<string, string | null>; err?: string }> {
+  scale?: number,
+  format?: "jpg" | "png" | "svg" | "pdf",
+  svg_include_id?: boolean,
+  svg_simplify_stroke?: boolean,
+  use_absolute_bounds?: boolean,
+  version?: string,
+): Promise<FigmaImageResponse> {
   try {
-    // 从 URL 中提取参数
-    const { fileKey, nodeId } = extractFigmaParams(figmaUrl);
+    // 检查 FIGMA_TOKEN 是否已设置
     const figmaToken = process.env.FIGMA_API_TOKEN;
     if (!figmaToken) {
-      throw new Error("FIGMA_API_TOKEN 环境变量未设置");
+      // 如果未设置 FIGMA_TOKEN，则抛出错误
+      throw new Error(
+        "FIGMA_TOKEN 环境变量未设置。请在 .env 文件中设置。例：FIGMA_TOKEN=your_token",
+      );
     }
 
-    // 确定要请求的节点 ID
-    const idsToFetch = nodeIds || (nodeId ? [nodeId] : []);
+    // 从 Figma URL 中提取 fileKey 和 nodeId
+    const { fileKey, nodeId: nodeIdFromUrl } = extractFigmaParams(figmaUrl);
 
-    if (idsToFetch.length === 0) {
+    // 确定要获取图片的节点 ID 列表
+    let idsToFetch: string[] = [];
+    if (nodeIds && nodeIds.length > 0) {
+      // 如果提供了 nodeIds 数组，则使用该数组
+      idsToFetch = nodeIds;
+    } else if (nodeIdFromUrl) {
+      // 否则，如果 URL 中包含 nodeId，则使用该 nodeId
+      idsToFetch = [nodeIdFromUrl];
+    } else {
+      // 如果两者都未提供，则抛出错误
       throw new Error("未提供节点 ID，无法获取图片");
     }
 
-    // 构建 API URL
-    const apiUrl = `https://api.figma.com/v1/images/${fileKey}?ids=${idsToFetch.join(
-      ",",
-    )}`;
+    // 构建 API 请求参数
+    const params: GetImageParams = {
+      fileKey,
+      nodeIds: idsToFetch,
+      figmaToken,
+      scale,
+      format,
+      svg_include_id,
+      svg_simplify_stroke,
+      use_absolute_bounds,
+      version,
+    };
 
     // 发起请求
-    const response = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        "X-FIGMA-TOKEN": figmaToken,
-      },
-    });
+    const images = await getImage(params);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Figma API 请求失败 (${response.status}): ${errorText}`);
-    }
-
-    // 解析响应
-    const data = (await response.json()) as {
-      images: Record<string, string | null>;
-      err?: string;
+    return {
+      images,
     };
-    return data;
-  } catch (error) {
+  } catch (error: unknown) {
+    // 打印错误信息到控制台
     console.error("获取 Figma 图片失败:", error);
+    // 返回包含错误信息的对象
+    const errorMessage =
+      error instanceof Error ? error.message : "获取 Figma 图片时发生未知错误";
     return {
       images: {},
-      err: `获取 Figma 图片失败: ${(error as Error).message}`,
+      err: errorMessage,
     };
   }
 }

@@ -69,7 +69,7 @@ To use this MCP service, you need to connect to it from an MCP client. Here are 
 
 #### Using with MCP Client Library
 
-````typescript
+```typescript
 import { McpClient } from "@modelcontextprotocol/client";
 
 // Initialize the client
@@ -139,7 +139,7 @@ console.log(JSON.parse(figmaResult.content[0].text));
     imageUrl: string // URL of the image to retrieve dimensions for
   }
 }
-````
+```
 
 #### get_local_image_size
 
@@ -183,6 +183,10 @@ console.log(JSON.parse(figmaResult.content[0].text));
   }
 }
 ```
+
+## Changelog
+
+- **2025-05-12:** Updated Figma API to support additional parameters, including 2x image scaling.
 
 ## Technical Implementation
 

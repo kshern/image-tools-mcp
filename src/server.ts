@@ -120,8 +120,38 @@ export const createServer = () => {
             .describe(
               "Optional array of node IDs, if not provided, use the nodeId extracted from the URL",
             ),
+          scale: z
+            .number()
+            .min(0.01)
+            .max(4)
+            .optional()
+            .describe("Optional: image scale, between 0.01 and 4"),
+          format: z
+            .enum(["jpg", "png", "svg", "pdf"])
+            .optional()
+            .describe("Optional: image format (jpg, png, svg, pdf)"),
+          svg_include_id: z
+            .boolean()
+            .optional()
+            .describe(
+              "Optional (SVG only): include id attributes in SVG output",
+            ),
+          svg_simplify_stroke: z
+            .boolean()
+            .optional()
+            .describe("Optional (SVG only): simplify strokes to outlines"),
+          use_absolute_bounds: z
+            .boolean()
+            .optional()
+            .describe("Optional: use absolute bounds for export"),
+          version: z
+            .string()
+            .optional()
+            .describe("Optional: a specific version of the file to use"),
         })
-        .describe("Options for getting images from Figma API"),
+        .describe(
+          "Options for getting images from Figma API, e.g. https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/imageId",
+        ),
     };
   }
 
@@ -339,6 +369,34 @@ export const createServer = () => {
               .describe(
                 "Optional array of node IDs, if not provided, use the nodeId extracted from the URL",
               ),
+            scale: z
+              .number()
+              .min(0.01)
+              .max(4)
+              .optional()
+              .describe("Optional: image scale, between 0.01 and 4"),
+            format: z
+              .enum(["jpg", "png", "svg", "pdf"])
+              .optional()
+              .describe("Optional: image format (jpg, png, svg, pdf)"),
+            svg_include_id: z
+              .boolean()
+              .optional()
+              .describe(
+                "Optional (SVG only): include id attributes in SVG output",
+              ),
+            svg_simplify_stroke: z
+              .boolean()
+              .optional()
+              .describe("Optional (SVG only): simplify strokes to outlines"),
+            use_absolute_bounds: z
+              .boolean()
+              .optional()
+              .describe("Optional: use absolute bounds for export"),
+            version: z
+              .string()
+              .optional()
+              .describe("Optional: a specific version of the file to use"),
           })
           .describe(
             "Options for getting images from Figma API, e.g. https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/imageId",
@@ -346,13 +404,37 @@ export const createServer = () => {
       },
       async ({ options = {} }) => {
         try {
-          const { figmaUrl, nodeIds } = options as {
+          const {
+            figmaUrl,
+            nodeIds,
+            scale,
+            format,
+            svg_include_id,
+            svg_simplify_stroke,
+            use_absolute_bounds,
+            version,
+          } = options as {
             figmaUrl: string;
             nodeIds?: string[];
+            scale?: number;
+            format?: "jpg" | "png" | "svg" | "pdf";
+            svg_include_id?: boolean;
+            svg_simplify_stroke?: boolean;
+            use_absolute_bounds?: boolean;
+            version?: string;
           };
 
           // Call tool function implementation
-          const result = await getFigmaImages(figmaUrl, nodeIds);
+          const result = await getFigmaImages(
+            figmaUrl,
+            nodeIds,
+            scale,
+            format,
+            svg_include_id,
+            svg_simplify_stroke,
+            use_absolute_bounds,
+            version,
+          );
 
           // Check if there is an error
           if (result.err) {
