@@ -166,6 +166,10 @@ console.log(JSON.parse(compressLocalResult.content[0].text));
 - [probe-image-size](https://github.com/nodeca/probe-image-size) - 用于图片尺寸检测
 - [tinify](https://github.com/tinify/tinify-nodejs) - 通过 TinyPNG API 进行图片压缩
 
+## 修改记录
+
+- **2025-05-12:** 更新 Figma API，支持包括 2x 图像缩放在内的额外参数。
+
 ## 环境变量
 
 - `TINIFY_API_KEY` - 图片压缩功能所需。从 [TinyPNG](https://tinypng.com/developers) 获取您的 API 密钥
