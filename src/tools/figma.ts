@@ -165,7 +165,7 @@ export async function getFigmaImages(
 ): Promise<FigmaImageResponse> {
   try {
     // 检查 FIGMA_TOKEN 是否已设置
-    const figmaToken = process.env.FIGMA_TOKEN;
+    const figmaToken = process.env.FIGMA_API_TOKEN;
     if (!figmaToken) {
       // 如果未设置 FIGMA_TOKEN，则抛出错误
       throw new Error(
