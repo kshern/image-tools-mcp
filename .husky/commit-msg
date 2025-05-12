@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+# 检查提交消息格式
+# 提交消息格式要求：type(scope): message
+# 例如：feat(image): 添加图片压缩功能
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# 定义提交消息的正则表达式格式
+commit_pattern='^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\([a-z0-9_\-]+\))?: .{1,}$'
+
+if ! echo "$commit_msg" | grep -E "$commit_pattern" > /dev/null; then
+  echo "❌ 提交消息格式错误! 正确格式: type(scope): message"
+  echo "例如:"
+  echo "  feat(image): 添加图片压缩功能"
+  echo "  fix(api): 修复API返回错误"
+  echo "有效的type包括: feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert"
+  exit 1
+fi
+
+exit 0

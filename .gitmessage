@@ -1,0 +1,20 @@
+# 提交消息格式: <type>(<scope>): <subject>
+# 示例: feat(image): 添加图片压缩功能
+#
+# type 类型:
+# feat: 新功能
+# fix: 修复Bug
+# docs: 文档变更
+# style: 代码格式化，不影响代码逻辑
+# refactor: 重构，不新增功能也不修Bug
+# perf: 性能优化
+# test: 测试相关
+# chore: 构建过程或辅助工具的变动
+# ci: 持续集成相关
+# build: 构建系统或外部依赖变动
+# revert: 回滚commit
+#
+# scope (可选): 影响范围，例如组件名称或文件名
+# subject: 简洁描述，不超过50个字符
+#
+# 提交消息详细说明: (可选)

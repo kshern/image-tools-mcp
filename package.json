@@ -24,7 +24,21 @@
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"**/*.{md,json,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{md,json,yml,yaml}\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "prepare": "husky",
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{md,json,yml,yaml}": [
+      "prettier --write"
+    ],
+    "**/*.ts?(x)": [
+      "tsc --noEmit"
+    ]
   },
   "keywords": [
     "mcp",
@@ -75,6 +89,7 @@
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
     "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
     "prettier": "^3.5.3"
   }
 }

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# 在提交前运行lint-staged配置进行代码检查和格式化
+npm run pre-commit
