@@ -164,12 +164,12 @@ export async function getFigmaImages(
   version?: string,
 ): Promise<FigmaImageResponse> {
   try {
-    // 检查 FIGMA_TOKEN 是否已设置
+    // 检查 FIGMA_API_TOKEN 是否已设置
     const figmaToken = process.env.FIGMA_API_TOKEN;
     if (!figmaToken) {
-      // 如果未设置 FIGMA_TOKEN，则抛出错误
+      // 如果未设置 FIGMA_API_TOKEN，则抛出错误
       throw new Error(
-        "FIGMA_TOKEN 环境变量未设置。请在 .env 文件中设置。例：FIGMA_TOKEN=your_token",
+        "FIGMA_API_TOKEN 环境变量未设置。请在配置文件中设置。例：FIGMA_API_TOKEN=your_token",
       );
     }
 
