@@ -13,6 +13,8 @@
 
 ### 效果展示
 
+![Example Result 1](./public/image_gemini_1.jpg)
+![Example Result 2](./public/image_gemini_2.jpg)
 ![效果图1](./public/image_1.png)
 ![效果图2](./public/image_2.png)
 
@@ -34,11 +36,7 @@
 
 要使用此 MCP 服务，您需要从 MCP 客户端连接到它。以下是与不同客户端集成的示例：
 
-#### 与 Claude Desktop 一起使用
-
-1. 从 [claude.ai/download](https://claude.ai/download) 安装 Claude Desktop
-2. 获取 TinyPNG API 密钥：访问 [TinyPNG](https://tinypng.com/developers) 并获取 API 密钥
-3. 通过编辑配置文件，配置 Claude Desktop 使用此 MCP 服务器：
+#### 使用方式
 
 ```json
 {
@@ -54,12 +52,6 @@
   }
 }
 ```
-
-4. 重启 Claude Desktop
-5. 请求 Claude 获取图片尺寸："告诉我这张图片的尺寸：https://example.com/image.jpg"
-6. 请求 Claude 压缩图片："帮我压缩这张图片：https://example.com/image.jpg"
-7. 请求 Claude 压缩本地图片："帮我压缩这张图片：D:/path/to/image.png"
-8. 请求 Claude 压缩本地图片："帮我压缩这个文件夹下的图片：D:/imageFolder/"
 
 #### 使用 MCP 客户端库
 
