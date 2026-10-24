@@ -1,6 +1,6 @@
 # Image Tools MCP
 
-[![smithery badge](https://smithery.ai/badge/@kshern/image-tools-mcp)](https://smithery.ai/server/@kshern/image-tools-mcp)
+[![LightNow capabilities](https://lightnow.ai/badge/io.github.kshern/image-tools-mcp)](https://lightnow.ai/servers/io.github.kshern/image-tools-mcp)
 
 A Model Context Protocol (MCP) service for retrieving image dimensions and compressing images, supporting both URL and local file sources.
 
